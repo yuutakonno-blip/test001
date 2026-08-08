@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>DeNA vs 阪神 応援メモ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Noto+Sans+JP:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0;">
+<div id="cheer-app-root"></div>
+<style>
+  #cheer-app-root, #cheer-app-root * { box-sizing: border-box; }
+  #cheer-app-root {
+    --bg: #EEF0EC;
+    --paper: #FFFFFF;
+    --ink: #16181C;
+    --sub: #6B7078;
+    --line: #DADEDD;
+
+    --dena-deep: #0A2350;
+    --dena-mid: #16468C;
+    --dena-bright: #3FA9F5;
+
+    --tig-black: #1A1A1A;
+    --tig-yellow: #F5D300;
+    --tig-stripe: #2B2B2B;
+
+    --chance: #E8362B;
+    --chance-dark: #A5170D;
+
+    --team-deep: var(--dena-deep);
+    --team-mid: var(--dena-mid);
+    --team-bright: var(--dena-bright);
+    --team-text-on: #FFFFFF;
+
+    font-family: 'Noto Sans JP', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 96px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #cheer-app-root[data-team="tigers"] {
+    --team-deep: var(--tig-black);
+    --team-mid: var(--tig-stripe);
+    --team-bright: var(--tig-yellow);
+    --team-text-on: #1A1A1A;
+  }
+  #cheer-app-root .num-font { font-family: 'Teko', 'Noto Sans JP', sans-serif; }
+
+  .app-header {
+    background: linear-gradient(135deg, var(--team-deep), var(--team-mid));
+    color: var(--team-text-on);
+    padding: 18px 16px 16px;
+    border-radius: 0 0 22px 22px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    transition: background 0.35s ease;
+  }
+  .app-title {
+    font-family: 'Teko', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    margin: 0 0 2px;
+  }
+  .app-sub { font-size: 11px; opacity: 0.85; margin: 0 0 14px; }
+
+  .team-tabs {
+    display: flex;
+    gap: 8px;
+    background: rgba(255,255,255,0.14);
+    padding: 4px;
+    border-radius: 999px;
+  }
+  .team-tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px 4px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 13.5px;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--team-text-on);
+    opacity: 0.65;
+    transition: all 0.2s ease;
+  }
+  .team-tab.active {
+    opacity: 1;
+    background: var(--paper);
+    color: var(--team-deep);
+  }
+  #cheer-app-root[data-team="tigers"] .team-tab.active { color: var(--tig-black); background: var(--tig-yellow); }
+
+  .section { padding: 16px; }
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--sub);
+    letter-spacing: 1px;
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-label .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--team-mid); }
+  .section-head-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .link-btn {
+    border: none;
+    background: none;
+    color: var(--team-mid);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+  #cheer-app-root[data-team="tigers"] .link-btn { color: var(--tig-black); }
+
+  .pitcher-card, .player-card, .theme-card, .roster-card {
+    background: var(--paper);
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .pitcher-row, .player-row, .roster-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 10px;
+  }
+  .badge {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--team-deep);
+    color: var(--team-text-on);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Teko', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  #cheer-app-root[data-team="tigers"] .badge { background: var(--tig-black); color: var(--tig-yellow); border: 1px solid var(--tig-yellow); }
+
+  .order-badge {
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: var(--bg);
+    font-family: 'Teko', sans-serif;
+    font-size: 14px;
+    color: var(--sub);
+    font-weight: 700;
+  }
+  .field-name, .slot-select {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .slot-select:invalid, .slot-select.empty { color: var(--sub); font-weight: 500; }
+  .expand-btn, .remove-btn {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--sub);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .expand-btn:disabled { opacity: 0.35; cursor: default; }
+  .remove-btn { color: #B0453D; }
+
+  .chant-panel {
+    border-top: 1px dashed var(--line);
+    padding: 10px 12px 12px;
+    background: #FAFAF8;
+    display: none;
+    font-size: 13px;
+  }
+  .chant-panel.open { display: block; }
+  .chant-panel .ct-note { white-space: pre-wrap; color: var(--ink); line-height: 1.6; }
+  .chant-panel .ct-empty { color: var(--sub); font-size: 12px; }
+
+  .chant-note-input {
+    width: 100%;
+    min-height: 54px;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13px;
+    resize: vertical;
+    font-family: inherit;
+  }
+  .chant-field-label { font-size: 11px; color: var(--sub); font-weight: 700; margin: 8px 0 4px; }
+  .chant-field-label:first-child { margin-top: 0; }
+
+  .current-row {
+    outline: 2px solid var(--team-bright);
+    outline-offset: -1px;
+  }
+  #cheer-app-root[data-team="tigers"] .current-row { outline-color: var(--tig-yellow); }
+
+  .now-batting {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9.5px;
+    font-weight: 800;
+    color: var(--team-deep);
+    background: var(--team-bright);
+    padding: 2px 6px;
+    border-radius: 5px;
+    letter-spacing: 0.5px;
+    flex: 0 0 auto;
+  }
+  #cheer-app-root[data-team="tigers"] .now-batting { background: var(--tig-yellow); color: var(--tig-black); }
+
+  .add-row-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1.5px dashed var(--line);
+    background: transparent;
+    color: var(--sub);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+
+  .share-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: var(--team-deep);
+    color: var(--team-text-on);
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 22px;
+  }
+  #cheer-app-root[data-team="tigers"] .share-btn { background: var(--tig-black); color: var(--tig-yellow); }
+
+  .share-panel {
+    margin-top: 10px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+  }
+  .share-hint { font-size: 11.5px; color: var(--sub); line-height: 1.5; margin: 0 0 8px; }
+  .share-link-input {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 11.5px;
+    color: var(--ink);
+    background: var(--bg);
+    margin-bottom: 8px;
+  }
+  .share-actions { display: flex; gap: 8px; }
+  .share-copy-btn, .share-close-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .share-copy-btn { background: var(--team-deep); color: var(--team-text-on); }
+  #cheer-app-root[data-team="tigers"] .share-copy-btn { background: var(--tig-black); color: var(--tig-yellow); }
+  .share-close-btn { background: var(--bg); color: var(--sub); border: 1px solid var(--line); }
+  .share-status { font-size: 11.5px; color: var(--team-mid); margin: 8px 0 0; text-align: center; }
+
+  .batter-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+  .nav-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: none;
+    background: var(--team-deep);
+    color: var(--team-text-on);
+    font-size: 16px;
+    cursor: pointer;
+  }
+  #cheer-app-root[data-team="tigers"] .nav-btn { background: var(--tig-black); color: var(--tig-yellow); }
+  .nav-center { text-align: center; flex: 1; }
+  .nav-center .lbl { font-size: 10px; color: var(--sub); font-weight: 700; letter-spacing: 1px; }
+  .nav-center .name { font-size: 15px; font-weight: 800; margin-top: 1px; }
+
+  /* roster management panel */
+  .roster-panel {
+    background: #F7F8F6;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  .roster-panel .roster-hint {
+    font-size: 11.5px;
+    color: var(--sub);
+    margin: 0 0 10px;
+    line-height: 1.5;
+  }
+  .roster-main { flex: 1 1 auto; min-width: 0; }
+  .roster-main .field-name { margin-bottom: 6px; width: 100%; }
+
+  /* Chance theme editor cards */
+  .theme-row { padding: 10px 10px 4px; display: flex; align-items: flex-start; gap: 8px; }
+  .theme-main { flex: 1 1 auto; min-width: 0; }
+  .theme-main .field-name { margin-bottom: 6px; width: 100%; }
+  .theme-note-input {
+    width: 100%;
+    min-height: 44px;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 12.5px;
+    resize: vertical;
+    font-family: inherit;
+  }
+
+  .chance-fab {
+    position: fixed;
+    right: 16px;
+    bottom: 18px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--chance), var(--chance-dark));
+    color: #fff;
+    border: none;
+    font-family: 'Teko', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    line-height: 1.15;
+    box-shadow: 0 8px 20px rgba(232,54,43,0.45);
+    cursor: pointer;
+    z-index: 50;
+    animation: fab-pulse 2.2s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) { .chance-fab { animation: none; } }
+  @keyframes fab-pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 8px 20px rgba(232,54,43,0.45); }
+    50% { transform: scale(1.06); box-shadow: 0 10px 26px rgba(232,54,43,0.6); }
+  }
+
+  .chance-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    background: repeating-linear-gradient(135deg, var(--chance) 0 26px, var(--chance-dark) 26px 52px);
+  }
+  .chance-overlay.open { display: flex; }
+  .chance-top { padding: 20px 18px 8px; text-align: center; color: #fff; }
+  .chance-kicker { font-size: 12px; letter-spacing: 3px; opacity: 0.85; font-weight: 700; }
+  .chance-title {
+    font-family: 'Teko', sans-serif;
+    font-size: 46px;
+    line-height: 1;
+    margin: 2px 0 2px;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    animation: chance-scale 1.4s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) { .chance-title { animation: none; } }
+  @keyframes chance-scale { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  .chance-team { font-size: 14px; font-weight: 700; }
+
+  .theme-switcher { display: flex; gap: 6px; overflow-x: auto; padding: 8px 14px; -webkit-overflow-scrolling: touch; }
+  .theme-chip {
+    flex: 0 0 auto; padding: 7px 14px; border-radius: 999px; border: none;
+    background: rgba(255,255,255,0.35); color: #fff; font-size: 12.5px; font-weight: 700;
+    white-space: nowrap; cursor: pointer;
+  }
+  .theme-chip.active { background: #fff; color: var(--chance-dark); }
+
+  .chance-body {
+    flex: 1; margin: 6px 14px 14px; background: rgba(255,255,255,0.96);
+    border-radius: 16px; padding: 16px; overflow-y: auto;
+  }
+  .chance-body .theme-display-title { font-size: 18px; font-weight: 800; color: var(--chance-dark); margin-bottom: 8px; }
+  .chance-body .theme-display-note { font-size: 14.5px; line-height: 1.7; white-space: pre-wrap; color: var(--ink); }
+  .chance-empty { font-size: 13px; color: var(--sub); text-align: center; padding: 20px 6px; }
+  .chance-close {
+    margin: 0 14px 18px; padding: 14px; border-radius: 14px; border: none;
+    background: #1A1A1A; color: #fff; font-weight: 800; font-size: 15px; cursor: pointer;
+  }
+
+  .footer-note { text-align: center; font-size: 10.5px; color: var(--sub); padding: 4px 16px 10px; }
+  .footer-note button {
+    border: none; background: none; color: #B0453D; text-decoration: underline;
+    font-size: 10.5px; cursor: pointer; padding: 0;
+  }
+  .save-flag { text-align: center; font-size: 10px; color: var(--sub); padding-top: 2px; height: 14px; }
+</style>
+
+<script>
+(function(){
+  let uidCounter = 1;
+  function newId(){ return 'p' + (uidCounter++) + '_' + Math.random().toString(36).slice(2,7); }
+
+  function blankRosterPlayer(){
+    return { id: newId(), name: "", chantNote: "" };
+  }
+  function blankSlot(order){
+    return { order, playerId: null };
+  }
+  function blankTheme(){
+    return { title: "", note: "" };
+  }
+
+  function defaultTeam(name){
+    return {
+      name,
+      roster: [],
+      rosterOpen: true,
+      lineup: Array.from({length:9}, (_,i)=>blankSlot(i+1)),
+      current: 0,
+      chanceThemes: [blankTheme()],
+      activeChanceIndex: 0,
+    };
+  }
+
+  let state = {
+    activeTeam: "dena",
+    chanceOpen: false,
+    teams: {
+      dena: defaultTeam("DeNAベイスターズ"),
+      tigers: defaultTeam("阪神タイガース"),
+    }
+  };
+
+  // transient UI state for the share-link panel (not persisted)
+  let shareLinkVisible = false;
+  let shareLinkValue = "";
+  let shareCopyStatus = "";
+
+  const STORAGE_KEY = "dena-tigers-cheer-app-v3";
+  let saveTimer = null;
+
+  function scheduleSave(){
+    clearTimeout(saveTimer);
+    const flag = document.getElementById('save-flag');
+    if (flag) flag.textContent = "編集中…";
+    saveTimer = setTimeout(async ()=>{
+      try {
+        if (window.storage) {
+          await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
+        } else if (window.localStorage) {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } else {
+          if (flag) flag.textContent = "この端末には保存されません(このセッション中のみ有効)";
+          return;
+        }
+        if (flag) flag.textContent = "保存済み";
+      } catch(e){
+        if (flag) flag.textContent = "保存に失敗しました";
+      }
+    }, 500);
+  }
+
+  async function loadState(){
+    try {
+      if (window.storage) {
+        const res = await window.storage.get(STORAGE_KEY, false);
+        if (res && res.value) {
+          const loaded = JSON.parse(res.value);
+          if (loaded && loaded.teams) state = loaded;
+        }
+      } else if (window.localStorage) {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const loaded = JSON.parse(raw);
+          if (loaded && loaded.teams) state = loaded;
+        }
+      }
+    } catch(e){
+      // no saved data yet, or storage unavailable — keep defaults
+    }
+
+    // if a share link was opened, its data in the URL hash takes priority
+    try {
+      const hash = window.location.hash || "";
+      if (hash.indexOf('#data=') === 0) {
+        const encoded = hash.slice('#data='.length);
+        const loaded = JSON.parse(decodeURIComponent(encoded));
+        if (loaded && loaded.teams) {
+          state = loaded;
+          scheduleSave();
+        }
+        // clean the URL so the long data string doesn't stay visible/bookmarked
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, "", window.location.pathname + window.location.search);
+        }
+      }
+    } catch(e){
+      // malformed or missing share data — ignore and keep whatever state we have
+    }
+  }
+
+  function buildShareLink(){
+    const base = window.location.origin + window.location.pathname + window.location.search;
+    return base + '#data=' + encodeURIComponent(JSON.stringify(state));
+  }
+
+  function findPlayer(team, id){
+    if (!id) return null;
+    return team.roster.find(r=>r.id===id) || null;
+  }
+
+  function render(){
+    const root = document.getElementById('cheer-app-root');
+    root.setAttribute('data-team', state.activeTeam);
+    const team = state.teams[state.activeTeam];
+    const lineup = team.lineup;
+    const cur = Math.min(team.current, lineup.length-1);
+    const curPlayer = findPlayer(team, lineup[cur].playerId);
+    const themes = team.chanceThemes;
+    const activeThemeIdx = Math.min(team.activeChanceIndex, Math.max(themes.length-1, 0));
+    const activeTheme = themes[activeThemeIdx];
+
+    root.innerHTML = `
+      <div class="app-header">
+        <p class="app-title">DeNA vs 阪神 応援メモ</p>
+        <p class="app-sub">選手を事前登録 → 当日はスタメンを呼び出すだけ</p>
+        <div class="team-tabs">
+          <button class="team-tab ${state.activeTeam==='dena'?'active':''}" data-action="switch-team" data-team="dena">DeNA</button>
+          <button class="team-tab ${state.activeTeam==='tigers'?'active':''}" data-action="switch-team" data-team="tigers">阪神</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head-row">
+          <p class="section-label" style="margin:0;"><span class="dot"></span>選手の登録（事前準備）</p>
+          <button class="link-btn" data-action="toggle-roster">${team.rosterOpen ? '閉じる' : '開く'}</button>
+        </div>
+        ${team.rosterOpen ? renderRosterPanel(team) : ''}
+
+        <p class="section-label"><span class="dot"></span>打順・スタメン</p>
+
+        <div class="batter-nav">
+          <button class="nav-btn" data-action="prev-batter">◀</button>
+          <div class="nav-center">
+            <div class="lbl">現在の打者</div>
+            <div class="name">${cur+1}番 ${curPlayer ? escapeHtml(curPlayer.name) : "(未選択)"}</div>
+          </div>
+          <button class="nav-btn" data-action="next-batter">▶</button>
+        </div>
+
+        <div id="player-list">
+          ${lineup.map((s, i)=>renderLineupCard(team, s, i, i===cur)).join('')}
+        </div>
+
+        ${lineup.length < 12 ? `<button class="add-row-btn" data-action="add-slot">＋ 打順を追加</button>` : ''}
+
+        <p class="section-label" style="margin-top:20px;"><span class="dot"></span>チャンステーマ（複数登録可）</p>
+        <div id="theme-list">
+          ${themes.map((t,i)=>renderThemeCard(t,i)).join('')}
+        </div>
+        <button class="add-row-btn" data-action="add-theme">＋ チャンステーマを追加</button>
+
+        <button class="share-btn" data-action="open-share">🔗 共有リンクを作成（両チームの登録内容を送る）</button>
+        ${shareLinkVisible ? renderSharePanel() : ''}
+      </div>
+
+      <div class="footer-note">
+        歌詞は著作物のため入力していません。曲名やコールの合図をご自身で書き込んでください。<br/>
+        <button data-action="reset-team">このチームの内容をリセット</button>
+      </div>
+      <div class="save-flag" id="save-flag"></div>
+
+      <button class="chance-fab" data-action="open-chance">チャンス<br/>テーマ</button>
+
+      <div class="chance-overlay ${state.chanceOpen?'open':''}" id="chance-overlay">
+        <div class="chance-top">
+          <div class="chance-kicker">CHANCE THEME</div>
+          <div class="chance-title">チャンス!!</div>
+          <div class="chance-team">${escapeHtml(team.name)}</div>
+        </div>
+        ${themes.length > 0 ? `
+          <div class="theme-switcher">
+            ${themes.map((t,i)=>`<button class="theme-chip ${i===activeThemeIdx?'active':''}" data-action="select-theme" data-idx="${i}">${escapeHtml(t.title) || `テーマ${i+1}`}</button>`).join('')}
+          </div>
+          <div class="chance-body">
+            <div class="theme-display-title">${escapeHtml(activeTheme.title) || `テーマ${activeThemeIdx+1}`}</div>
+            <div class="theme-display-note">${escapeHtml(activeTheme.note) || "(メモが未入力です。通常表示に戻って入力できます)"}</div>
+          </div>
+        ` : `
+          <div class="chance-body">
+            <div class="chance-empty">チャンステーマがまだ登録されていません。<br/>通常表示に戻って「＋チャンステーマを追加」から登録してください。</div>
+          </div>
+        `}
+        <button class="chance-close" data-action="close-chance">通常表示に戻る</button>
+      </div>
+    `;
+
+    bindEvents();
+  }
+
+  function renderRosterPanel(team){
+    return `
+      <div class="roster-panel">
+        <p class="roster-hint">応援する可能性がある選手をまとめて登録しておくと、当日は下のプルダウンから選ぶだけで打順に呼び出せます。</p>
+        <div id="roster-list">
+          ${team.roster.map((r,i)=>renderRosterCard(r,i)).join('') || '<p class="ct-empty" style="padding:4px 2px;">まだ選手が登録されていません</p>'}
+        </div>
+        <button class="add-row-btn" data-action="add-roster">＋ 選手を登録</button>
+      </div>
+    `;
+  }
+
+  function renderRosterCard(r, i){
+    return `
+      <div class="roster-card">
+        <div class="roster-row">
+          <div class="badge">${i+1}</div>
+          <div class="roster-main">
+            <input class="field-name" data-field="roster-name" data-idx="${i}" placeholder="選手名" value="${escapeHtml(r.name)}" />
+            <textarea class="chant-note-input" data-field="roster-chant-note" data-idx="${i}" placeholder="コール・振り付けメモ">${escapeHtml(r.chantNote)}</textarea>
+          </div>
+          <button class="remove-btn" data-action="remove-roster" data-idx="${i}">✕</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderPlayerSelect(team, selectedId, kind, slotIdx){
+    const opts = team.roster.map(r=>`<option value="${r.id}" ${r.id===selectedId?'selected':''}>${escapeHtml(r.name) || '(名前未入力)'}</option>`).join('');
+    const emptyState = team.roster.length === 0;
+    return `<select class="slot-select ${!selectedId?'empty':''}" data-select-kind="${kind}" ${slotIdx!==null?`data-idx="${slotIdx}"`:''} ${emptyState?'disabled':''}>
+      <option value="" ${!selectedId?'selected':''}>${emptyState ? '先に選手を登録してください' : '－ 選手を選択 －'}</option>
+      ${opts}
+    </select>`;
+  }
+
+  function renderLineupCard(team, slot, i, isCurrent){
+    const player = findPlayer(team, slot.playerId);
+    const hasChant = player && player.chantNote;
+    return `
+      <div class="player-card">
+        <div class="player-row ${isCurrent?'current-row':''}">
+          <div class="order-badge num-font">${slot.order}</div>
+          ${renderPlayerSelect(team, slot.playerId, 'lineup', i)}
+          ${isCurrent?'<span class="now-batting">NOW</span>':''}
+          <button class="expand-btn" data-action="toggle-chant" data-idx="${i}" ${!player?'disabled':''}>♪</button>
+          <button class="remove-btn" data-action="remove-slot" data-idx="${i}">✕</button>
+        </div>
+        <div class="chant-panel ${slot.open?'open':''}">
+          ${player ? (hasChant ? `
+            <div class="ct-note">${escapeHtml(player.chantNote)}</div>
+          ` : `<div class="ct-empty">この選手のコールメモはまだ登録されていません。「選手の登録」から追加できます。</div>`) : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderThemeCard(t, i){
+    return `
+      <div class="theme-card">
+        <div class="theme-row">
+          <div class="badge">${i+1}</div>
+          <div class="theme-main">
+            <input class="field-name" data-field="theme-title" data-idx="${i}" placeholder="テーマ名（例: 7回チャンステーマ）" value="${escapeHtml(t.title)}" />
+            <textarea class="theme-note-input" data-field="theme-note" data-idx="${i}" placeholder="曲名やコールの合図をメモ">${escapeHtml(t.note)}</textarea>
+          </div>
+          <button class="remove-btn" data-action="remove-theme" data-idx="${i}">✕</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSharePanel(){
+    return `
+      <div class="share-panel">
+        <p class="share-hint">このリンクを開いた人には、今登録されている両チームの選手・スタメン・チャンステーマがすべて反映されます（開いた側の内容は上書きされます）。</p>
+        <input class="share-link-input" id="share-link-input" type="text" readonly value="${escapeHtml(shareLinkValue)}" />
+        <div class="share-actions">
+          <button class="share-copy-btn" data-action="copy-share">コピーする</button>
+          <button class="share-close-btn" data-action="close-share">閉じる</button>
+        </div>
+        ${shareCopyStatus ? `<p class="share-status">${escapeHtml(shareCopyStatus)}</p>` : ''}
+      </div>
+    `;
+  }
+
+  function escapeHtml(str){
+    return (str||"").replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function bindEvents(){
+    const root = document.getElementById('cheer-app-root');
+
+    root.querySelectorAll('[data-action="switch-team"]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.activeTeam = btn.getAttribute('data-team');
+        render();
+      });
+    });
+
+    const rosterToggle = root.querySelector('[data-action="toggle-roster"]');
+    if (rosterToggle) rosterToggle.addEventListener('click', ()=>{
+      const team = state.teams[state.activeTeam];
+      team.rosterOpen = !team.rosterOpen;
+      scheduleSave();
+      render();
+    });
+
+    // roster management
+    root.querySelectorAll('[data-action="remove-roster"]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        const team = state.teams[state.activeTeam];
+        const removedId = team.roster[idx].id;
+        team.roster.splice(idx,1);
+        team.lineup.forEach(s=>{ if (s.playerId === removedId) s.playerId = null; });
+        scheduleSave();
+        render();
+      });
+    });
+    const addRoster = root.querySelector('[data-action="add-roster"]');
+    if (addRoster) addRoster.addEventListener('click', ()=>{
+      const team = state.teams[state.activeTeam];
+      team.roster.push(blankRosterPlayer());
+      scheduleSave();
+      render();
+    });
+
+    // lineup slot management
+    root.querySelectorAll('[data-action="toggle-chant"]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        const team = state.teams[state.activeTeam];
+        team.lineup[idx].open = !team.lineup[idx].open;
+        render();
+      });
+    });
+    root.querySelectorAll('[data-action="remove-slot"]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        const team = state.teams[state.activeTeam];
+        team.lineup.splice(idx,1);
+        team.lineup.forEach((s,i)=>s.order=i+1);
+        if (team.current >= team.lineup.length) team.current = Math.max(0, team.lineup.length-1);
+        scheduleSave();
+        render();
+      });
+    });
+    const addSlot = root.querySelector('[data-action="add-slot"]');
+    if (addSlot) addSlot.addEventListener('click', ()=>{
+      const team = state.teams[state.activeTeam];
+      team.lineup.push(blankSlot(team.lineup.length+1));
+      scheduleSave();
+      render();
+    });
+
+    const prevBtn = root.querySelector('[data-action="prev-batter"]');
+    if (prevBtn) prevBtn.addEventListener('click', ()=>{
+      const team = state.teams[state.activeTeam];
+      team.current = (team.current - 1 + team.lineup.length) % team.lineup.length;
+      scheduleSave();
+      render();
+    });
+    const nextBtn = root.querySelector('[data-action="next-batter"]');
+    if (nextBtn) nextBtn.addEventListener('click', ()=>{
+      const team = state.teams[state.activeTeam];
+      team.current = (team.current + 1) % team.lineup.length;
+      scheduleSave();
+      render();
+    });
+
+    // player select dropdowns (pitcher + lineup slots)
+    root.querySelectorAll('select[data-select-kind]').forEach(sel=>{
+      sel.addEventListener('change', ()=>{
+        const team = state.teams[state.activeTeam];
+        const val = sel.value || null;
+        const idx = parseInt(sel.getAttribute('data-idx'));
+        team.lineup[idx].playerId = val;
+        scheduleSave();
+        render();
+      });
+    });
+
+    // Chance theme management
+    root.querySelectorAll('[data-action="remove-theme"]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        const team = state.teams[state.activeTeam];
+        team.chanceThemes.splice(idx,1);
+        if (team.activeChanceIndex >= team.chanceThemes.length) {
+          team.activeChanceIndex = Math.max(0, team.chanceThemes.length-1);
+        }
+        scheduleSave();
+        render();
+      });
+    });
+    const addTheme = root.querySelector('[data-action="add-theme"]');
+    if (addTheme) addTheme.addEventListener('click', ()=>{
+      const team = state.teams[state.activeTeam];
+      team.chanceThemes.push(blankTheme());
+      scheduleSave();
+      render();
+    });
+    root.querySelectorAll('[data-action="select-theme"]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        state.teams[state.activeTeam].activeChanceIndex = idx;
+        scheduleSave();
+        render();
+      });
+    });
+
+    const openChance = root.querySelector('[data-action="open-chance"]');
+    if (openChance) openChance.addEventListener('click', ()=>{
+      state.chanceOpen = true;
+      render();
+    });
+    const closeChance = root.querySelector('[data-action="close-chance"]');
+    if (closeChance) closeChance.addEventListener('click', ()=>{
+      state.chanceOpen = false;
+      render();
+    });
+
+    const openShare = root.querySelector('[data-action="open-share"]');
+    if (openShare) openShare.addEventListener('click', ()=>{
+      shareLinkValue = buildShareLink();
+      shareCopyStatus = "";
+      shareLinkVisible = true;
+      render();
+    });
+    const closeShare = root.querySelector('[data-action="close-share"]');
+    if (closeShare) closeShare.addEventListener('click', ()=>{
+      shareLinkVisible = false;
+      shareCopyStatus = "";
+      render();
+    });
+    const copyShare = root.querySelector('[data-action="copy-share"]');
+    if (copyShare) copyShare.addEventListener('click', async ()=>{
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(shareLinkValue);
+          shareCopyStatus = "コピーしました";
+        } else {
+          const input = document.getElementById('share-link-input');
+          input.removeAttribute('readonly');
+          input.focus();
+          input.select();
+          document.execCommand('copy');
+          input.setAttribute('readonly', 'readonly');
+          shareCopyStatus = "コピーしました";
+        }
+      } catch(e){
+        shareCopyStatus = "コピーできませんでした。リンクを長押しして手動でコピーしてください";
+      }
+      render();
+    });
+
+    const resetBtn = root.querySelector('[data-action="reset-team"]');
+    if (resetBtn) resetBtn.addEventListener('click', ()=>{
+      if (!confirm('このチームの登録選手・スタメン・チャンステーマをすべて消去します。よろしいですか？')) return;
+      const key = state.activeTeam;
+      const name = state.teams[key].name;
+      state.teams[key] = defaultTeam(name);
+      scheduleSave();
+      render();
+    });
+
+    // text inputs -> update state without full re-render (preserve focus)
+    root.querySelectorAll('input[data-field], textarea[data-field]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        const field = el.getAttribute('data-field');
+        const idx = parseInt(el.getAttribute('data-idx'));
+        const team = state.teams[state.activeTeam];
+        if (field === 'roster-name') team.roster[idx].name = el.value;
+        else if (field === 'roster-chant-note') team.roster[idx].chantNote = el.value;
+        else if (field === 'theme-title') team.chanceThemes[idx].title = el.value;
+        else if (field === 'theme-note') team.chanceThemes[idx].note = el.value;
+        scheduleSave();
+      });
+    });
+
+    // roster name edits should refresh dropdown labels once user leaves the field
+    root.querySelectorAll('input[data-field="roster-name"]').forEach(el=>{
+      el.addEventListener('blur', ()=>{ render(); });
+    });
+  }
+
+  (async function init(){
+    await loadState();
+    render();
+  })();
+})();
+</script>
+</body>
+</html>
